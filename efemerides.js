@@ -46,3 +46,7 @@ const EFEMERIDES = [
     imagen: null
   }
 ];
+
+// Exponer los datos al ámbito global para que index.html los lea.
+// (const en el ámbito de módulo del navegador NO se adjunta a window solo.)
+window.EFEMERIDES = EFEMERIDES;
