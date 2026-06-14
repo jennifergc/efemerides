@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Efemérides · La Libreta de Ciencia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Spline+Sans+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* Cielo profundo — no negro plano, sino un azul de noche astronómica */
+    --sky-0:#080b16;
+    --sky-1:#0d1224;
+    --sky-2:#141b33;
+    --ink:#e8ebf5;
+    --ink-soft:#9aa3c0;
+    --ink-faint:#5a6486;
+    --line:#222a47;
+    --line-soft:#1a2138;
+    /* acento: el resplandor de una estrella caliente, clase O/B */
+    --glow:#7fb2ff;
+    --glow-warm:#ffd9a0;
+
+    /* colores por disciplina (distinguibles, no saturados de más) */
+    --d-fisica:#7fb2ff;
+    --d-astronomia:#c9a8ff;
+    --d-quimica:#7fe0c4;
+    --d-biologia:#9fe07f;
+    --d-matematicas:#ffd9a0;
+    --d-exploracion:#ff9eb1;
+    --d-otro:#9aa3c0;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+
+  html{-webkit-text-size-adjust:100%}
+
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:
+      radial-gradient(1200px 700px at 80% -10%, #16203f 0%, transparent 55%),
+      radial-gradient(900px 600px at 5% 110%, #11182e 0%, transparent 55%),
+      var(--sky-0);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.5;
+    /* estrellas tenues de fondo, pintadas con gradientes radiales */
+    position:relative;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.6), transparent),
+      radial-gradient(1px 1px at 70% 20%, rgba(255,255,255,.4), transparent),
+      radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1px 1px at 85% 60%, rgba(255,255,255,.35), transparent),
+      radial-gradient(1px 1px at 55% 45%, rgba(255,255,255,.45), transparent),
+      radial-gradient(1.5px 1.5px at 12% 85%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1px 1px at 90% 90%, rgba(255,255,255,.3), transparent);
+    opacity:.5;
+  }
+
+  .wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:clamp(20px,5vw,56px) clamp(16px,4vw,40px)}
+
+  /* ---------- Cabecera ---------- */
+  header.masthead{
+    display:flex;align-items:flex-end;justify-content:space-between;
+    gap:24px;flex-wrap:wrap;
+    border-bottom:1px solid var(--line);
+    padding-bottom:22px;margin-bottom:30px;
+  }
+  .eyebrow{
+    font-family:'Spline Sans Mono',monospace;
+    font-size:11px;letter-spacing:.28em;text-transform:uppercase;
+    color:var(--glow);margin-bottom:10px;
+  }
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:clamp(30px,6vw,52px);
+    line-height:1.02;letter-spacing:-.01em;
+    font-optical-sizing:auto;
+  }
+  h1 em{font-style:italic;color:var(--glow-warm)}
+  .masthead .sub{
+    font-family:'Spline Sans Mono',monospace;
+    font-size:12px;color:var(--ink-faint);text-align:right;line-height:1.7
+  }
+
+  /* ---------- Barra de navegación de mes ---------- */
+  .monthbar{
+    display:flex;align-items:center;justify-content:space-between;
+    gap:16px;margin-bottom:18px;
+  }
+  .month-title{
+    font-family:'Fraunces',serif;font-weight:500;
+    font-size:clamp(22px,4vw,30px);letter-spacing:-.01em;
+  }
+  .month-title .yr{color:var(--ink-faint);font-size:.62em;margin-left:.4em;font-family:'Spline Sans Mono',monospace}
+  .navbtns{display:flex;gap:8px}
+  .navbtns button{
+    width:42px;height:42px;border-radius:50%;
+    background:var(--sky-2);border:1px solid var(--line);
+    color:var(--ink);font-size:17px;cursor:pointer;
+    display:grid;place-items:center;
+    transition:border-color .18s,background .18s,transform .12s;
+  }
+  .navbtns button:hover{border-color:var(--glow);background:#1a2440}
+  .navbtns button:active{transform:scale(.93)}
+  .navbtns button:focus-visible{outline:2px solid var(--glow);outline-offset:2px}
+  .today-btn{
+    width:auto!important;padding:0 16px;border-radius:21px!important;
+    font-family:'Spline Sans Mono',monospace;font-size:12px;letter-spacing:.04em;
+  }
+
+  /* ---------- Rejilla ---------- */
+  .dow{
+    display:grid;grid-template-columns:repeat(7,1fr);
+    gap:6px;margin-bottom:6px;
+  }
+  .dow span{
+    font-family:'Spline Sans Mono',monospace;
+    font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-faint);text-align:center;padding:4px 0;
+  }
+  .grid{
+    display:grid;grid-template-columns:repeat(7,1fr);
+    gap:6px;
+  }
+  .cell{
+    position:relative;aspect-ratio:1/1;
+    border:1px solid var(--line-soft);border-radius:12px;
+    background:linear-gradient(180deg,var(--sky-1),var(--sky-0));
+    padding:8px;
+    display:flex;flex-direction:column;
+    transition:border-color .18s,transform .12s,box-shadow .25s;
+  }
+  .cell.empty{background:transparent;border-color:transparent}
+  .cell .num{
+    font-family:'Spline Sans Mono',monospace;font-size:13px;
+    color:var(--ink-soft);
+  }
+  .cell.today{border-color:var(--glow)}
+  .cell.today .num{color:var(--glow);font-weight:500}
+
+  /* días con efeméride: brillan */
+  .cell.has-event{cursor:pointer}
+  .cell.has-event:hover{
+    border-color:var(--glow);
+    transform:translateY(-2px);
+    box-shadow:0 8px 24px -8px rgba(127,178,255,.35);
+  }
+  .cell.has-event:focus-visible{outline:2px solid var(--glow);outline-offset:2px}
+  .cell .dots{
+    margin-top:auto;display:flex;flex-wrap:wrap;gap:4px;align-items:center;
+  }
+  .dot{
+    width:8px;height:8px;border-radius:50%;
+    box-shadow:0 0 8px 1px currentColor;
+  }
+  .ev-name{
+    font-size:11px;line-height:1.25;color:var(--ink);
+    margin-top:5px;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+  @media(max-width:560px){
+    .ev-name{display:none}
+    .cell{padding:6px}
+  }
+
+  /* ---------- Leyenda ---------- */
+  .legend{
+    display:flex;flex-wrap:wrap;gap:14px;margin-top:26px;
+    padding-top:20px;border-top:1px solid var(--line);
+  }
+  .legend .item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-soft)}
+
+  /* ---------- Panel de detalle (modal) ---------- */
+  .overlay{
+    position:fixed;inset:0;z-index:50;
+    background:rgba(4,6,14,.7);backdrop-filter:blur(6px);
+    display:none;align-items:center;justify-content:center;
+    padding:20px;opacity:0;transition:opacity .22s;
+  }
+  .overlay.open{display:flex;opacity:1}
+  .panel{
+    background:linear-gradient(180deg,var(--sky-2),var(--sky-1));
+    border:1px solid var(--line);border-radius:18px;
+    max-width:560px;width:100%;max-height:88vh;overflow-y:auto;
+    padding:clamp(22px,4vw,34px);
+    transform:translateY(14px) scale(.98);transition:transform .22s;
+    box-shadow:0 30px 80px -20px rgba(0,0,0,.7);
+  }
+  .overlay.open .panel{transform:none}
+  .panel .close{
+    float:right;width:34px;height:34px;border-radius:50%;
+    background:transparent;border:1px solid var(--line);color:var(--ink-soft);
+    cursor:pointer;font-size:16px;line-height:1;
+  }
+  .panel .close:hover{border-color:var(--glow);color:var(--ink)}
+  .panel .date-chip{
+    font-family:'Spline Sans Mono',monospace;font-size:12px;
+    letter-spacing:.06em;color:var(--glow);margin-bottom:14px;
+  }
+  .panel h2{
+    font-family:'Fraunces',serif;font-weight:500;
+    font-size:clamp(22px,4vw,30px);line-height:1.1;letter-spacing:-.01em;
+    margin-bottom:10px;
+  }
+  .panel .disc-tag{
+    display:inline-block;font-family:'Spline Sans Mono',monospace;
+    font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    padding:3px 10px;border-radius:20px;margin-bottom:16px;
+    border:1px solid currentColor;
+  }
+  .panel img{width:100%;border-radius:12px;margin:6px 0 16px;display:block}
+  .panel .body{color:var(--ink-soft);font-size:15px;line-height:1.65}
+  .panel .more{
+    display:inline-flex;align-items:center;gap:8px;margin-top:20px;
+    font-family:'Spline Sans Mono',monospace;font-size:13px;
+    color:var(--sky-0);background:var(--glow);text-decoration:none;
+    padding:10px 18px;border-radius:24px;font-weight:500;
+    transition:transform .12s,box-shadow .2s;
+  }
+  .panel .more:hover{transform:translateY(-1px);box-shadow:0 8px 20px -6px rgba(127,178,255,.5)}
+  .panel .event + .event{margin-top:26px;padding-top:26px;border-top:1px solid var(--line)}
+
+  @media(prefers-reduced-motion:reduce){
+    *{transition:none!important}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="masthead">
+    <div>
+      <div class="eyebrow">La Libreta de Ciencia</div>
+      <h1>Efemérides del <em>cielo</em> y la ciencia</h1>
+    </div>
+    <div class="sub" id="counter">—</div>
+  </header>
+
+  <div class="monthbar">
+    <div class="month-title" id="monthTitle"></div>
+    <div class="navbtns">
+      <button class="today-btn" id="todayBtn" aria-label="Ir al mes actual">Hoy</button>
+      <button id="prevBtn" aria-label="Mes anterior">‹</button>
+      <button id="nextBtn" aria-label="Mes siguiente">›</button>
+    </div>
+  </div>
+
+  <div class="dow" aria-hidden="true">
+    <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+  </div>
+  <div class="grid" id="grid" role="grid" aria-label="Calendario de efemérides"></div>
+
+  <div class="legend" id="legend"></div>
+</div>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="panelTitle">
+  <div class="panel" id="panel"></div>
+</div>
+
+<script src="efemerides.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio",
+    "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+
+  const DISC = {
+    fisica:      {label:"Física",       color:"var(--d-fisica)"},
+    astronomia:  {label:"Astronomía",   color:"var(--d-astronomia)"},
+    quimica:     {label:"Química",      color:"var(--d-quimica)"},
+    biologia:    {label:"Biología",     color:"var(--d-biologia)"},
+    matematicas: {label:"Matemáticas",  color:"var(--d-matematicas)"},
+    exploracion: {label:"Exploración",  color:"var(--d-exploracion)"},
+    otro:        {label:"Otro",         color:"var(--d-otro)"}
+  };
+  const discOf = d => DISC[d] || DISC.otro;
+
+  // Indexar efemérides por "mes-dia" para acceso O(1)
+  const byKey = {};
+  (window.EFEMERIDES || []).forEach(e=>{
+    const k = e.mes + "-" + e.dia;
+    (byKey[k] = byKey[k] || []).push(e);
+  });
+
+  const today = new Date();
+  let view = new Date(today.getFullYear(), today.getMonth(), 1);
+
+  const grid   = document.getElementById("grid");
+  const title  = document.getElementById("monthTitle");
+  const counter= document.getElementById("counter");
+  const overlay= document.getElementById("overlay");
+  const panel  = document.getElementById("panel");
+
+  function render(){
+    const year = view.getFullYear(), month = view.getMonth();
+    title.innerHTML = MESES[month] + ' <span class="yr">' + year + '</span>';
+
+    // total de efemérides en el mes
+    let monthCount = 0;
+    for(const k in byKey){ if(k.split("-")[0] == (month+1)) monthCount += byKey[k].length; }
+    counter.innerHTML = monthCount
+      ? monthCount + (monthCount===1?" efeméride":" efemérides") + "<br>este mes"
+      : "Sin efemérides<br>este mes";
+
+    grid.innerHTML = "";
+
+    // Lunes = 0 ... Domingo = 6
+    const firstDow = (new Date(year, month, 1).getDay() + 6) % 7;
+    const daysInMonth = new Date(year, month+1, 0).getDate();
+
+    for(let i=0;i<firstDow;i++){
+      const c = document.createElement("div");
+      c.className = "cell empty"; c.setAttribute("aria-hidden","true");
+      grid.appendChild(c);
+    }
+
+    for(let d=1; d<=daysInMonth; d++){
+      const key = (month+1) + "-" + d;
+      const events = byKey[key];
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      cell.setAttribute("role","gridcell");
+
+      const isToday = (year===today.getFullYear() && month===today.getMonth() && d===today.getDate());
+      if(isToday) cell.classList.add("today");
+
+      let html = '<div class="num">' + d + '</div>';
+
+      if(events){
+        cell.classList.add("has-event");
+        cell.tabIndex = 0;
+        cell.setAttribute("aria-label", d + " de " + MESES[month] + ": " + events.map(e=>e.nombre).join(", "));
+        const first = events[0];
+        html += '<div class="ev-name">' + esc(first.nombre) +
+                (events.length>1 ? ' <span style="color:var(--ink-faint)">+'+(events.length-1)+'</span>' : '') +
+                '</div>';
+        html += '<div class="dots">' + events.map(e=>
+          '<span class="dot" style="color:'+discOf(e.disciplina).color+'"></span>'
+        ).join('') + '</div>';
+
+        cell.addEventListener("click", ()=>openPanel(events, month, d));
+        cell.addEventListener("keydown", ev=>{
+          if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); openPanel(events, month, d); }
+        });
+      }
+      cell.innerHTML = html;
+      grid.appendChild(cell);
+    }
+  }
+
+  function openPanel(events, month, day){
+    let h = '<button class="close" aria-label="Cerrar">✕</button>';
+    h += '<div class="date-chip">' + day + ' DE ' + MESES[month].toUpperCase() + '</div>';
+    h += events.map(e=>{
+      const dsc = discOf(e.disciplina);
+      let block = '<div class="event">';
+      block += '<h2 id="panelTitle">' + esc(e.nombre) + '</h2>';
+      block += '<span class="disc-tag" style="color:'+dsc.color+'">' + dsc.label +
+               (e.anio ? ' · ' + e.anio : '') + '</span>';
+      if(e.imagen) block += '<img src="'+esc(e.imagen)+'" alt="'+esc(e.nombre)+'" loading="lazy">';
+      if(e.texto)  block += '<p class="body">' + esc(e.texto) + '</p>';
+      if(e.enlace) block += '<a class="more" href="'+esc(e.enlace)+'" target="_blank" rel="noopener">Leer el artículo completo →</a>';
+      block += '</div>';
+      return block;
+    }).join('');
+    panel.innerHTML = h;
+    panel.querySelector(".close").addEventListener("click", closePanel);
+    overlay.classList.add("open");
+    panel.querySelector(".close").focus();
+  }
+
+  function closePanel(){ overlay.classList.remove("open"); }
+
+  overlay.addEventListener("click", e=>{ if(e.target===overlay) closePanel(); });
+  document.addEventListener("keydown", e=>{ if(e.key==="Escape") closePanel(); });
+
+  document.getElementById("prevBtn").addEventListener("click", ()=>{ view.setMonth(view.getMonth()-1); render(); });
+  document.getElementById("nextBtn").addEventListener("click", ()=>{ view.setMonth(view.getMonth()+1); render(); });
+  document.getElementById("todayBtn").addEventListener("click", ()=>{ view = new Date(today.getFullYear(), today.getMonth(), 1); render(); });
+
+  // Leyenda: solo disciplinas presentes en los datos
+  const present = new Set((window.EFEMERIDES||[]).map(e=> DISC[e.disciplina]?e.disciplina:"otro"));
+  document.getElementById("legend").innerHTML = [...present].map(d=>{
+    const dsc = discOf(d);
+    return '<span class="item"><span class="dot" style="color:'+dsc.color+'"></span>'+dsc.label+'</span>';
+  }).join('');
+
+  function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  render();
+})();
+</script>
+</body>
+</html>
